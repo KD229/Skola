@@ -1,0 +1,23 @@
+body {
+    font-family: 'Times New Roman';
+    color: #000000;
+    background-image: url('sundiszno.jpg');
+    background-size: 50%;
+    background-position: center;
+}
+#mezo1 {
+    background-color:lightgreen;
+    color: #000000
+}
+#mezo2 {
+    text-shadow: 2px 2px #FFFFFF;;
+}
+b {
+    font-size: 24;
+}
+.minta1 {
+    background-color: rgb(230,255,230);
+}
+.minta2 {
+    background-color: white;
+}
