@@ -5,8 +5,48 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Koszta Dávid - Főoldal</title>
+    <style>
+        h1 {
+            font-size: 86px;
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 200px;
+        }
+        .listButton {
+            border-radius: 8px;
+            border-color: #000000;
+            background-color: #FFFFFF;
+            border-width: 1px;
+            font-size: 32px;
+            font-family: Century Gothic;
+            padding:24px;
+            padding-bottom: 12px;
+            padding-top: 12px;
+            cursor: pointer;
+        }
+        .listButton:hover {
+            background-color: rgb(37, 59, 255);
+        }
+        .githubButton {
+            display: block;
+            border: none;
+            background: none;
+            margin: auto;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body>
-    amogus
+<script>
+    function githublink() {
+        window.open('https://www.github.com/KD229')
+    }
+</script>
+<body bgcolor="lightgreen">
+    <h1>Koszta Dávid</h1>
+    <div style="text-align: center">
+        <button type="button" onclick="window.open('orarend.html','_self')" class="listButton">Órarend</button>
+    <div style="width: 99%; position: absolute; bottom: 34px;">
+        <button type="button" onclick="githublink()" class="githubButton"><img src="Github Logo.png"></button>
+    </div>
 </body>
 </html>
