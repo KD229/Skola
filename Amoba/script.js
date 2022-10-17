@@ -1,6 +1,6 @@
 o = "O", meret = 10, Xpont = 0, Opont = 0, PontSzamlalo = document.getElementById("pont")
 f = e => {
-    if(e.innerHTML == "") {
+    if(e.innerHTML.trim() == "") {
         o = o == "X" ? "O" : "X"
         e.innerHTML = o, e.setAttribute('class', o)
         x = e.cellIndex, y = e.parentElement.rowIndex, t[x][y] = o
