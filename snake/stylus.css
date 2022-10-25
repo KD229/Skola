@@ -1,0 +1,50 @@
+body {
+    text-align: center;
+    background-color: rgb(33, 33, 134);
+    color: rgb(0, 255, 130);
+}
+td {
+    width: 15px;
+    height: 15px;
+    background-color: rgb(100, 200, 55);
+    box-shadow: 1px 1px 4px inset black;
+    border-radius: 2px;
+    text-align: center;
+    font-size: 10px;
+    color: rgb(248, 246, 201);
+    user-select: none;
+}
+table {
+    margin: auto;
+    padding: 6px;
+    border-spacing: 0px;
+    background-color: azure;
+    border-radius: 7px;
+    box-shadow: 1px 1px 4px black;
+    user-select: none;
+}
+button {
+    background-color: rgb(0, 255, 170);
+    border-color: rgb(0, 255, 100);
+    border-radius: 3px;
+}
+.selected {
+    background-color: rgb(0, 128, 90);
+    border-color: rgb(0, 128, 50);
+}
+input {
+    width: 50px;
+}
+li {
+    margin-bottom: 10px;
+}
+ul {
+    display: inline;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+p {
+    color: rgb(200, 0, 0);
+    font-size: 18px;
+}
