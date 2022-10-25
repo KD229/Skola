@@ -194,8 +194,8 @@ function endGame() {
 function foodRoll(amounth) {
     for (let i = 0; i <= amounth; i++) {
         for (let ii = 0; ii <= 300; ii++) {
-            ranY = Math.floor(Math.random() * (n))
-            ranX = Math.floor(Math.random() * (m))
+            ranY = Math.floor(Math.random() * (m))
+            ranX = Math.floor(Math.random() * (n))
             if (ii == 300) {table[ranY][ranX] = 2; to.children[ranY].children[ranX].style.backgroundColor = "yellow"}
             else if (table[ranY][ranX] == 0) {table[ranY][ranX] = 2; to.children[ranY].children[ranX].style.backgroundColor = "yellow"; break}
         }
