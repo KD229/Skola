@@ -1,12 +1,21 @@
 let temp = undefined
+playerList = []
 controls = [["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"],["w","s","a","d"],["u","j","h","k"],["8","2","4","6"]]
 menu = document.getElementById("menu")
 colors = ["red","blue","green","purple"]
 magyarSzinek = ["piros","kék","zöld","lila"]
 gameSpeeds = [200,175,120]
-function controller(e) {switch (true) {
-    
-}}
+function controller(e) {
+        if (playerList.length != 0) {
+            for (let i = 0; i<playerList.length; i++) {switch (true) {
+                case playerList[i].controls[0] == e.key && playerList[i].ydBad != 1  : [playerList[i].xd, playerList[i].yd] = [ 0,-1]; break
+                case playerList[i].controls[1] == e.key && playerList[i].ydBad != -1 : [playerList[i].xd, playerList[i].yd] = [ 0, 1]; break
+                case playerList[i].controls[2] == e.key && playerList[i].xdBad != 1  : [playerList[i].xd, playerList[i].yd] = [-1, 0]; break
+                case playerList[i].controls[3] == e.key && playerList[i].xdBad != -1 : [playerList[i].xd, playerList[i].yd] = [ 1, 0]; break
+            }
+        }
+    }
+}
 class settings {
     constructor(value) {
         this.value = value
@@ -39,12 +48,7 @@ class player {
         this.xd = xd
         this.yd = yd
         to.children[this.y].children[this.x].style.backgroundColor = this.color
-        addEventListener("keydown", e => {{switch (true) {
-            case this.controls[0] == e.key && this.ydBad != 1  : [this.xd, this.yd] = [ 0,-1]; break
-            case this.controls[1] == e.key && this.ydBad != -1 : [this.xd, this.yd] = [ 0, 1]; break
-            case this.controls[2] == e.key && this.xdBad != 1  : [this.xd, this.yd] = [-1, 0]; break
-            case this.controls[3] == e.key && this.xdBad != -1 : [this.xd, this.yd] = [ 1, 0]; break
-        }}})}   
+    }
     step = function() {
         if (this.exploding) {
             if (this.snakeBody.length == 1 && this.explodeStage == 1) {
@@ -56,6 +60,7 @@ class player {
                 table[this.snakeBody[0][0]][this.snakeBody[0][1]] = 0
                 this.snakeBody.shift()
                 this.exploding = false
+                playersDying -= 1
             }
             else if (this.snakeBody.length == 2 && this.explodeStage == 2) {
                 to.children[this.snakeBody[1][0]].children[this.snakeBody[1][1]].style.backgroundColor = "yellow"
@@ -158,7 +163,8 @@ function gameStart() {
     playerList.forEach(element => {
         element.start(0,0)
     })
-    playersAlive = playerNumConf+1
+    console.log(typeof(playerNumConf))
+    playersAlive = playerNumConf.value+1
     playersDying = 0
     foodRoll(foodNumConf.value)
     iv = setInterval(() => {
@@ -168,12 +174,13 @@ function gameStart() {
         playerList.forEach(element => {
             element.check()
         })
-        if (playersAlive <= 1 && playerNumConf != 0) {
+        if (playersAlive <= 1 && playerNumConf.value != 0) {
             playerList.forEach(element => {
                 element.frozen = true
             })
         }
-        if (playersAlive == 1 && playersDying == 0 && playerNumConf != 0) {
+        console.log("Alive: "+playersAlive+" Dying: "+playersDying)
+        if (playersAlive == 1 && playersDying == 0 && playerNumConf.value != 0) {
             clearInterval(iv)
             endGame()
         }

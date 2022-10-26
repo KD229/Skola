@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake</title>
+    <link rel="stylesheet" href="stylus.css">
+</head>
+<body onkeydown="controller(event)">
+    <h1>Snake</h1>
+    <div id="menu">
+        <ul>
+            <li id="mapSizeConf">Pályaméret:
+                <input type="number" id="width">x<input type="number" id="height">
+            </li>
+            <li id="speedConf">Játék sebessége:
+                <button onmouseup="speedConf.set(this)">Lassú</button>
+                <button onmouseup="speedConf.set(this)">Közepes</button>
+                <button onmouseup="speedConf.set(this)">Gyors</button>
+            </li>
+            <li id="foodNumConf">Almák száma:
+                <button onmouseup="foodNumConf.set(this)">1</button>
+                <button onmouseup="foodNumConf.set(this)">2</button>
+                <button onmouseup="foodNumConf.set(this)">3</button>
+                <button onmouseup="foodNumConf.set(this)">4</button>
+            </li>
+            <li id="playerNumConf">Játékosszám:
+                <button onmouseup="playerNumConf.set(this)">1</button>
+                <button onmouseup="playerNumConf.set(this)">2</button>
+                <button onmouseup="playerNumConf.set(this)">3</button>
+                <button onmouseup="playerNumConf.set(this)">4</button>
+            </li>
+            <li id="StartButton">
+                <button onmouseup="gameStart()">START</button>
+            </li>
+            <p id="confError"></p>
+        </ul>
+    </div>
+    <div id="t"></div>
+</body>
+<script src="logic.js" type="text/javascript"></script>
+</html>
