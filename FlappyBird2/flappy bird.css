@@ -1,4 +1,4 @@
-div {
+#gameDiv {
     width: 600px;
     height: 400px;
     display: block;
@@ -10,4 +10,10 @@ div {
 h1 {
     text-align: center;
     font-size: 32px;
+}
+div {
+    text-align: center;
+}
+button {
+    text-align: center;
 }

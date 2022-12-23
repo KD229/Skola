@@ -10,8 +10,17 @@
 <body onkeydown="keypress()">
     <h1>Flappy Bird</h1>
     <div>
+        <button onmouseup="start(event)">START</button>
+        <br>
+        <p id="bestScore">Legjobb Pontszám: 0</p>
+    </div>
+    <div id="gameDiv">
         <canvas width = 600 height = 400 id="canvas"></canvas>
-        <img hidden = "True" src="Flappy.png" id="flappy">
+    </div>
+    <div id="images">
+        <img hidden src="Flappy.png">
+        <img hidden src="PipeTop.png">
+        <img hidden src="PipeBottom.png">
     </div>
 </body>
 </html>
