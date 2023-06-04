@@ -58,7 +58,7 @@ def e(lista):
 def delfinStart():
     lista = [random.randint(-5,3) for _ in range(80)]
     kiirni = []
-    print(lista)
+    kiirni.append(str(lista))
     temp = a(lista)
     kiirni.append("a: A delfin az út "+str(round(temp[0]*100,2))+"%-át tette meg a víz alatt és "+str(round(temp[1]*100,2))+"%-át tette meg a víz felett.")
     temp = b(lista)
