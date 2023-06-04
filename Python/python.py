@@ -75,3 +75,4 @@ def delfinStart():
     "\n".join(kiirni)
     div = Element("delfinDiv")
     div.element.innerText = kiirni
+delfinStart()
