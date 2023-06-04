@@ -72,7 +72,6 @@ def delfinStart():
     kiirni.append("c: A delfin leghosszabb kiugrása az út "+str(temp[1]+1)+". pontjánál kezdődött és "+str(temp[0])+" útszakasz hosszú volt.")
     kiirni.append("d: A delfin "+str(d(lista))+" alkalommal törte át a víz felszínét.")
     kiirni.append("e: A delfin "+str(e(lista))+" alkalommal merült mélyre.")
-    "\n".join(kiirni)
+    kiirni = "\n".join(kiirni)
     div = Element("delfinDiv")
     div.element.innerText = kiirni
-delfinStart()
