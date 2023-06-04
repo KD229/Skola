@@ -55,7 +55,7 @@ def e(lista):
                 ki += 1
         else: mely = False
     return ki
-def delfin():
+def delfinStart():
     lista = [random.randint(-5,3) for _ in range(80)]
     kiirni = []
     print(lista)
