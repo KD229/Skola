@@ -1,0 +1,8 @@
+#gameDiv {
+    width: 1200px;
+    height: 600px;
+    display: block;
+    margin: auto;
+    margin-top: 60px;
+    background-color: black;
+}

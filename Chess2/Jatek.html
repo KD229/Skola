@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="jatek.css">
+    <title>Jatek</title>
+</head>
+<body onkeydown="controlDown(event.key)", onkeyup="controlUp(event.key)">
+    <h1>Gaem</h1>
+    <div id="gameDiv">
+        <canvas width = 1200 height = 600 id="canvas"></canvas>
+    </div>
+    <div id="images", hidden>
+        <img src="king.png">
+        <img src="graphics/Imagine Dragons Enemy.png">
+    </div>
+    <p>X:</p>
+    <input type="text" id="x">
+    <p>Y:</p>
+    <input type="text" id="y">
+    <button onclick="doit()">MOVE TO</button>
+</body>
+</html>
+<script src="jatek.js"></script>
+<script src="pathing.js"></script>
+<script src="drawing.js"></script>
+<script src="controls.js"></script>
