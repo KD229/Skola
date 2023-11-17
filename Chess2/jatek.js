@@ -91,9 +91,9 @@ class character {
                 }
                 break
             case 1:
-                this.steptime = 30
-                this.airtime = 50
-                this.falltime = 4
+                this.stepTime = 30
+                this.airTime = 50
+                this.fallTime = 4
                 this.cooldown = 20
 
                 this.x = x
@@ -105,12 +105,12 @@ class character {
                         case 3: 
                             drawRect(260+this.x*120-camX-this.y*40,25+this.y*50-camY,65,40,"black",0.5)
                             drawImage(images[this.imageIndex], 260+this.x*120-camX-this.y*40,
-                            95+this.y*50+(60*Math.sin(Math.PI/2))*(1-this.stepping/this.stepTime)-camY,1)
+                            70+this.y*50+(120*Math.sin(Math.PI/2))*(this.stepping/this.fallTime)-camY,4)
                         break
                         case 2:
                             drawRect(260+this.x*120-camX-this.y*40,25+this.y*50-camY,65,40,"black",0.5)
                             drawImage(images[this.imageIndex], 260+this.x*120-camX-this.y*40,
-                            95+this.y*50+(60*Math.sin(Math.PI/2))-camY,1)
+                            70+this.y*50+(120*Math.sin(Math.PI/2))-camY,4)
                         break
                         
                         case 1: 
@@ -118,14 +118,13 @@ class character {
                         25+this.y*50+-((this.y-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
                         40,"black",0.5)
                         drawImage(images[this.imageIndex], 260+this.x*120 - ((this.x-this.startX)*120-(this.y-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.y*40,
-                        95+this.y*50+(60*Math.sin((Math.PI/2)*(this.stepping/this.stepTime)))-((this.y-this.startY)*50)*(this.stepping/this.stepTime)-camY,1)
+                        70+this.y*50+(120*Math.sin((Math.PI/2)*(1-this.stepping/this.stepTime)))-((this.y-this.startY)*50)*(this.stepping/this.stepTime)-camY,4)
                         break
                         case 4:
                         case 0:
                             drawRect(260+this.x*120-camX-this.y*40,25+this.y*50-camY,65,40,"black",0.5)
                             drawImage(images[this.imageIndex], 260+this.x*120-camX-this.y*40,
-                            95+this.y*50-camY,1)
-                            console.log("sss")
+                            70+this.y*50-camY,4)
                         break
                     }
                     
@@ -135,13 +134,13 @@ class character {
                 //STEP PHASES:  0: Standing Still   1: Jumping  2: Standing still in air    3:Smashing down 4: Cooling down
                 this.update = function() {
                     if (this.stepping != 0) {this.stepping -= 1}
-                    else if (this.stepping == 0 && this.stepphase == 3) {this.stepFinish()}
-                    if (this.stepphase == 0 && this.stepping == 0) {
-                        this.step(pathTo(player.y,player.x,this.x,this.y))
+                    else if (this.stepphase == 0 && this.stepping == 0) {
+                        this.step(pathTo(player.x,player.y,this.x,this.y))
+                        this.stepphase = 1
                     }
-                    else if (this.stepphase == 1 && this.stepping == 0) {this.stepphase = 2; this.stepping = this.airtime}
-                    else if (this.stepphase == 2 && this.stepping == 0) {this.stepphase = 3; this.stepping = this.falltime}
-                    else if (this.stepphase == 3 && this.stepping == 0) {this.stepphase = 4; this.stepping = this.cooldown}
+                    else if (this.stepphase == 1 && this.stepping == 0) {this.stepphase = 2; this.stepping = this.airTime}
+                    else if (this.stepphase == 2 && this.stepping == 0) {this.stepphase = 3; this.stepping = this.fallTime}
+                    else if (this.stepphase == 3 && this.stepping == 0) {this.stepFinish()}
                     else if (this.stepphase == 1 && this.stepping == Math.round(this.steptime / 2)) {console.log("ZOINKS")}
                 }
                 this.step = function(direction) {
@@ -158,8 +157,11 @@ class character {
                         case 3: this.y -= 1; break
                     }
                     tilelist[this.x][this.y].characters.push(this.id)
+                    characterRenderList[Math.min(this.y,this.startY)].push(this.id)
                 }
                 this.stepFinish = function() {
+                    this.stepphase = 0
+                    this.stepping = this.cooldown
                     if (this.startY < this.y) {
                         characterRenderList[this.startY] = characterRenderList[this.startY].filter((id) => id != this.id)
                         characterRenderList[this.y].push(this.id)
@@ -208,7 +210,6 @@ function drawGame() {
 function start() {
     player = new character(0, 2, 3)
     sus = new character(1, 4, 4)
-    console.log(sus)
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
         characterList.forEach(character => {
