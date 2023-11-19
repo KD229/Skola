@@ -61,10 +61,10 @@ class character {
 
                 this.stepping = 0
                 this.update = function() {
+                    if (this.stepping == 1) {this.stepFinish()}
                     if (this.stepping != 0) {this.stepping -= 1}
                     if (this.stepping == 0 && stepDir != null) {this.step(stepDir)}
                     if (this.stepping == Math.round(this.steptime / 2)) {console.log("ZOINKS")}
-                    if (this.stepping == 0) {this.stepFinish()}
                     //if (this.stepping == 0) {this.step(pathTo(xgoal,ygoal,this.x,this.y))}
                 }
                 this.step = function(direction) {
@@ -91,10 +91,10 @@ class character {
                 }
                 break
             case 1:
-                this.stepTime = 30
-                this.airTime = 50
-                this.fallTime = 4
-                this.cooldown = 20
+                this.stepTime = 25
+                this.airTime = 10
+                this.fallTime = 6
+                this.cooldown = 80
 
                 this.x = x
                 this.y = y
@@ -136,7 +136,6 @@ class character {
                     if (this.stepping != 0) {this.stepping -= 1}
                     else if (this.stepphase == 0 && this.stepping == 0) {
                         this.step(pathTo(player.x,player.y,this.x,this.y))
-                        this.stepphase = 1
                     }
                     else if (this.stepphase == 1 && this.stepping == 0) {this.stepphase = 2; this.stepping = this.airTime}
                     else if (this.stepphase == 2 && this.stepping == 0) {this.stepphase = 3; this.stepping = this.fallTime}
@@ -145,6 +144,7 @@ class character {
                 }
                 this.step = function(direction) {
                     if (direction == undefined) {return}
+                    this.stepphase = 1
                     this.stepping = this.stepTime
                     tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
                     characterRenderList[this.y] = characterRenderList[this.y].filter((id) => id != this.id)
@@ -212,6 +212,7 @@ function start() {
     sus = new character(1, 4, 4)
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
+        console.log(characterRenderList[5])
         characterList.forEach(character => {
             if (character == null) {return}
             character.update()
