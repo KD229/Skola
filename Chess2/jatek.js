@@ -1,7 +1,9 @@
 let context = document.getElementById("canvas").getContext("2d")
-let tilelist = Array(10).fill().map(() => Array(6).fill().map(() => ({type: 0,characters: [],danger: false}))) //tilelist[x][y]
+let tilelist = Array(10).fill().map(() => Array(6).fill().map(() => ({type: 0,characters: [],danger: false, occupied: 0}))) //tilelist[x][y]
+tilelist[4][2].type = 1
+tilelist[4][5].type = 1
 let camX = 0
-let camY = 0
+let camY = -50
 let images = null
 let xgoal = 0
 let ygoal = 0
@@ -22,6 +24,8 @@ window.onload = function() {
 let characterList = [null]
 let characterIndex = 0
 let player = null
+let gameOver = false
+let timers = [] //ACTION SYNTAX: [frames left, function]
 function charIndexIncrease() {
     characterIndex += 1
     while (characterList.length < characterIndex && characterList[characterIndex] == null) {characterIndex += 1}
@@ -34,61 +38,103 @@ function charIndexSet(index) {
 }
 class character {
     constructor(type,x,y) {
-        this.kill = function() {
-            charIndexSet(this.id)
-            tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+        this.x = x
+        this.y = y
+        tilelist[this.x][this.y].occupied = 2
+        this.startX = this.x
+        this.startY = this.y
+        this.endX = this.x
+        this.endY = this.y
+        this.dying = false
+        this.step = function(direction) {
+            if (direction == undefined) {return}
+            this.stepphase = 1
+            this.stepping = this.stepTime
+            characterRenderList[this.y] = characterRenderList[this.y].filter((id) => id != this.id)
+            switch(direction) {
+                case 0: this.endX += 1; break
+                case 1: this.endX -= 1; break
+                case 2: this.endY += 1; break
+                case 3: this.endY -= 1; break
+            }
+            characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
+        }
+        this.stepFinish = function() {
+            if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5 || tilelist[this.x][this.y].type == 1) {
+                this.kill(0)
+            }
+            if (this.startY < this.endY) {
+                characterRenderList[this.startY] = characterRenderList[this.startY].filter((id) => id != this.id)
+                characterRenderList[this.y].push(this.id)
+            }
+            this.startX = this.x
+            this.startY = this.y
+        }
+        this.halfStep = function() {
+            if (this.endX < 0 || this.endX > tilelist.length-1 || this.endY < 0 || this.endY > 5 || tilelist[this.endX][this.endY].occupied < 2) {
+                tilelist[this.x][this.y].occupied -= 2
+                tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+                this.x = this.endX
+                this.y = this.endY
+                if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6) {
+                    tilelist[this.x][this.y].occupied += 2
+                    tilelist[this.x][this.y].characters.push(this.id)
+                }
+            }
+            else {
+                this.startX = this.endX
+                this.startY = this.endY
+                this.endX = this.x
+                this.endY = this.y
+            }
         }
         switch(type) {
             case 0:
                 //GAME VALUES
                 this.stepTime = 20
-
-                this.x = x
-                this.y = y
-                this.startX = this.x
-                this.startY = this.y
+                this.yOffset = 0
 
                 this.imageIndex = 0
                 this.draw = function() {
-                    drawRect(260+this.x*120 - ((this.x-this.startX)*120-(this.y-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.y*40,
-                    25+this.y*50-((this.y-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
-                    40,"black",0.5)
+                    if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6 && tilelist[this.x][this.y].type != 1) {
+                        drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
+                        25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
+                        40,"black",0.5)
+                    }
                     // x: Offset of lowest row + position on x tyles - Movement, both in x and y axis - camera offset - adjusting for board diagonalness
                     // y: Offset for the height of the image + position on y tyles + Jump curve - Movement in y axis - camera offset
-                    drawImage(images[this.imageIndex], 260+this.x*120 - ((this.x-this.startX)*120-(this.y-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.y*40,
-                    95+this.y*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.y-this.startY)*50)*(this.stepping/this.stepTime)-camY,0.35)
+                    drawImage(images[this.imageIndex], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
+                    95+this.endY*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY+this.yOffset,0.35)
                 }
-
-                this.stepping = 0
+                this.kill = function(type) {
+                    charIndexSet(this.id)
+                    if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5) {
+                        tilelist[this.startX][this.startY].characters = tilelist[this.startX][this.startX].characters.filter((id) => id != this.id)
+                    }
+                    else
+                    tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+                    switch (type) {
+                        case 0:
+                            this.dying = 1
+                        break
+                        case 1:
+                            this.dying = 2
+                            this.draw = function() {}
+                        break
+                    }
+                    gameOver = true
+                }
+                
                 this.update = function() {
                     if (this.stepping == 1) {this.stepFinish()}
                     if (this.stepping != 0) {this.stepping -= 1}
-                    if (this.stepping == 0 && stepDir != null) {this.step(stepDir)}
-                    if (this.stepping == Math.round(this.steptime / 2)) {console.log("ZOINKS")}
-                    //if (this.stepping == 0) {this.step(pathTo(xgoal,ygoal,this.x,this.y))}
+                    if (this.dying == 1) {this.yOffset -= 30}
+                    else if (this.dying == 2) {}
+                    else if (this.stepping == 0 && stepDir != null) {this.step(stepDir)}
+                    else if (this.stepping == Math.round(this.stepTime / 2)) {this.halfStep()}
                 }
-                this.step = function(direction) {
-                    if (direction == undefined) {return}
-                    this.stepping = this.stepTime
-                    tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
-                    characterRenderList[this.y] = characterRenderList[this.y].filter((id) => id != this.id)
-                    this.startX = this.x
-                    this.startY = this.y
-                    switch(direction) {
-                        case 0: this.x += 1; break
-                        case 1: this.x -= 1; break
-                        case 2: this.y += 1; break
-                        case 3: this.y -= 1; break
-                    }
-                    tilelist[this.x][this.y].characters.push(this.id)
-                    characterRenderList[Math.min(this.y,this.startY)].push(this.id)
-                }
-                this.stepFinish = function() {
-                    if (this.startY < this.y) {
-                        characterRenderList[this.startY] = characterRenderList[this.startY].filter((id) => id != this.id)
-                        characterRenderList[this.y].push(this.id)
-                    }
-                }
+                
+                this.stepping = 0
                 break
             case 1:
                 this.stepTime = 25
@@ -96,72 +142,88 @@ class character {
                 this.fallTime = 6
                 this.cooldown = 80
 
-                this.x = x
-                this.y = y
-
                 this.imageIndex = 1
                 this.draw = function() {
                     switch (this.stepphase) {
-                        case 3: 
-                            drawRect(260+this.x*120-camX-this.y*40,25+this.y*50-camY,65,40,"black",0.5)
-                            drawImage(images[this.imageIndex], 260+this.x*120-camX-this.y*40,
-                            70+this.y*50+(120*Math.sin(Math.PI/2))*(this.stepping/this.fallTime)-camY,4)
+                        case 3:
+                            if (tilelist[this.x][this.y].type != 1) {drawRect(260+this.endX*120-camX-this.endY*40,25+this.endY*50-camY,65,40,"black",0.5)}
+                            drawImage(images[this.imageIndex], 260+this.endX*120-camX-this.endY*40,
+                            70+this.endY*50+(120*Math.sin(Math.PI/2))*(this.stepping/this.fallTime)-camY,4)
                         break
                         case 2:
-                            drawRect(260+this.x*120-camX-this.y*40,25+this.y*50-camY,65,40,"black",0.5)
-                            drawImage(images[this.imageIndex], 260+this.x*120-camX-this.y*40,
-                            70+this.y*50+(120*Math.sin(Math.PI/2))-camY,4)
+                            if (tilelist[this.x][this.y].type != 1) {drawRect(260+this.endX*120-camX-this.endY*40,25+this.endY*50-camY,65,40,"black",0.5)}
+                            drawImage(images[this.imageIndex], 260+this.endX*120-camX-this.endY*40,
+                            70+this.endY*50+(120*Math.sin(Math.PI/2))-camY,4)
                         break
                         
                         case 1: 
-                        drawRect(260+this.x*120 - ((this.x-this.startX)*120-(this.y-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.y*40,
-                        25+this.y*50+-((this.y-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
-                        40,"black",0.5)
-                        drawImage(images[this.imageIndex], 260+this.x*120 - ((this.x-this.startX)*120-(this.y-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.y*40,
-                        70+this.y*50+(120*Math.sin((Math.PI/2)*(1-this.stepping/this.stepTime)))-((this.y-this.startY)*50)*(this.stepping/this.stepTime)-camY,4)
+                        if (tilelist[this.x][this.y].type != 1) {drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
+                        25+this.endY*50+-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
+                        40,"black",0.5)}
+                        drawImage(images[this.imageIndex], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
+                        70+this.endY*50+(120*Math.sin((Math.PI/2)*(1-this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,4)
                         break
                         case 4:
                         case 0:
-                            drawRect(260+this.x*120-camX-this.y*40,25+this.y*50-camY,65,40,"black",0.5)
-                            drawImage(images[this.imageIndex], 260+this.x*120-camX-this.y*40,
-                            70+this.y*50-camY,4)
+                            if (tilelist[this.x][this.y].type != 1) {drawRect(260+this.endX*120-camX-this.endY*40,25+this.endY*50-camY,65,40,"black",0.5)}
+                            drawImage(images[this.imageIndex], 260+this.endX*120-camX-this.endY*40,
+                            70+this.endY*50-camY,4)
                         break
                     }
                     
                 }
                 this.stepping = 0
                 this.stepphase = 0
-                //STEP PHASES:  0: Standing Still   1: Jumping  2: Standing still in air    3:Smashing down 4: Cooling down
+                //STEP PHASES:  0: Standing Still   1: Jumping  2: Standing still in air    3: Smashing down    4: Cooling down
                 this.update = function() {
+                    if (this.stepphase == 1 && this.stepping == Math.round(this.stepTime / 2)) {this.halfStep()}
                     if (this.stepping != 0) {this.stepping -= 1}
                     else if (this.stepphase == 0 && this.stepping == 0) {
                         this.step(pathTo(player.x,player.y,this.x,this.y))
                     }
-                    else if (this.stepphase == 1 && this.stepping == 0) {this.stepphase = 2; this.stepping = this.airTime}
+                    else if (this.stepphase == 1 && this.stepping == 0) {this.stepFinish(); this.stepphase = 2; this.stepping = this.airTime}
                     else if (this.stepphase == 2 && this.stepping == 0) {this.stepphase = 3; this.stepping = this.fallTime}
-                    else if (this.stepphase == 3 && this.stepping == 0) {this.stepFinish()}
-                    else if (this.stepphase == 1 && this.stepping == Math.round(this.steptime / 2)) {console.log("ZOINKS")}
+                    else if (this.stepphase == 3 && this.stepping == 0) {this.attack()}
                 }
                 this.step = function(direction) {
                     if (direction == undefined) {return}
                     this.stepphase = 1
                     this.stepping = this.stepTime
-                    tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
                     characterRenderList[this.y] = characterRenderList[this.y].filter((id) => id != this.id)
-                    this.startX = this.x
-                    this.startY = this.y
                     switch(direction) {
-                        case 0: this.x += 1; break
-                        case 1: this.x -= 1; break
-                        case 2: this.y += 1; break
-                        case 3: this.y -= 1; break
+                        case 0: this.endX += 1; break
+                        case 1: this.endX -= 1; break
+                        case 2: this.endY += 1; break
+                        case 3: this.endY -= 1; break
                     }
-                    tilelist[this.x][this.y].characters.push(this.id)
-                    characterRenderList[Math.min(this.y,this.startY)].push(this.id)
+                    tilelist[this.endX][this.endY].occupied = 1
+                    characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
+                    if (this.endX > -1 && this.endX < tilelist.length && this.endY > -1 && this.endY < 6) {
+                        tilelist[this.endX][this.endY].occupied = 1
+                    }
                 }
-                this.stepFinish = function() {
+                this.halfStep = function() {
+                    if (this.endX < 0 || this.endX > tilelist.length-1 || this.endY < 0 || this.endY > 5 || tilelist[this.endX][this.endY].occupied < 2) {
+                        tilelist[this.x][this.y].occupied = 0
+                        tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+                        this.x = this.endX
+                        this.y = this.endY
+                        if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6) {
+                            tilelist[this.x][this.y].occupied = 2
+                            tilelist[this.x][this.y].characters.push(this.id)
+                        }
+                    }
+                    else {
+                        this.startX = this.endX
+                        this.startY = this.endY
+                        this.endX = this.x
+                        this.endY = this.y
+                    }
+                }
+                this.attack = function() {
                     this.stepphase = 0
                     this.stepping = this.cooldown
+                    tilelist[this.x][this.y].characters.forEach(id => {if (this.id != id) {characterList[id].kill(1)}})
                     if (this.startY < this.y) {
                         characterRenderList[this.startY] = characterRenderList[this.startY].filter((id) => id != this.id)
                         characterRenderList[this.y].push(this.id)
@@ -192,10 +254,12 @@ function FYS(array) {
     return array
 }
 //  DRAW UPDATE
-let characterRenderList = Array(6).fill().map(() => Array())
+let characterRenderList = Array(7).fill().map(() => Array())
 function drawGame() {
     //Called every game loop, responsible for drawing all graphics (No drawing should be outside of it!)
     drawRect(600,300,1200,600,"rgb(100, 130, 255)")
+    drawRect(600,0-camY,1200,550,"rgb(255, 0, 0)")
+    characterRenderList[6].forEach(element => {characterList[element].draw()})
     for (let ii = 5;ii > -1;ii--) {
         for (let i = 9;i > -1;i--) {
             switch(tilelist[i][ii].type) {
@@ -209,16 +273,26 @@ function drawGame() {
 //  GAME!!
 function start() {
     player = new character(0, 2, 3)
-    sus = new character(1, 4, 4)
+    new character(1, 6, 4)
+    new character(1, 6, 3)
+    new character(1, 6, 2)
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
-        console.log(characterRenderList[5])
         characterList.forEach(character => {
             if (character == null) {return}
             character.update()
         })
         pressedTick()
         drawGame()
+        timers.forEach(timer => {
+            if (timer[0] == 0) {
+                if (timer[2] != undefined) {timer[1](timer[2])}
+                else timer[1]()
+                timers = timers.filter((id) => id != this.id)
+            }
+            else timer[0]--
+            
+        })
     },10)
 }
 function doit() {
