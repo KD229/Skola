@@ -1,5 +1,6 @@
 let context = document.getElementById("canvas").getContext("2d")
 let tilelist = Array(10).fill().map(() => Array(6).fill().map(() => ({type: 0,characters: [],danger: false, occupied: 0}))) //tilelist[x][y]
+
 tilelist[4][2].type = 1
 tilelist[4][5].type = 1
 let camX = 0
@@ -15,6 +16,7 @@ window.onload = function() {
     images = document.getElementById("images").children
     start()
 }
+let occupyList
 
 //  CHARACTERS
 /* CHARACTER TYPES
@@ -47,52 +49,8 @@ class character {
         this.endY = this.y
         this.dying = false
         this.type = type
-        this.step = function(direction) {
-            if (direction == undefined) {return}
-            if (this.type == 0) {this.facing = direction}
-            this.stepphase = 1
-            this.stepping = this.stepTime
-            characterRenderList[this.y] = characterRenderList[this.y].filter((id) => id != this.id)
-            switch(direction) {
-                case 0: this.endX += 1; break
-                case 1: this.endX -= 1; break
-                case 2: this.endY += 1; break
-                case 3: this.endY -= 1; break
-            }
-            characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
-            if (this.type > 0 && this.endX > -1 && this.endX < tilelist.length && this.endY > -1 && this.endY < 6) {
-                tilelist[this.endX][this.endY].occupied = 1
-            }
-        }
-        this.stepFinish = function() {
-            if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5 || tilelist[this.x][this.y].type == 1) {
-                this.kill(0)
-            }
-            if (this.startY < this.endY) {
-                characterRenderList[this.startY] = characterRenderList[this.startY].filter((id) => id != this.id)
-                characterRenderList[this.y].push(this.id)
-            }
-            this.startX = this.x
-            this.startY = this.y
-        }
-        this.halfStep = function() {
-            if (this.endX < 0 || this.endX > tilelist.length-1 || this.endY < 0 || this.endY > 5 || tilelist[this.endX][this.endY].occupied < 2) {
-                tilelist[this.x][this.y].occupied = 0
-                tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
-                this.x = this.endX
-                this.y = this.endY
-                if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6) {
-                    tilelist[this.x][this.y].occupied += 2
-                    tilelist[this.x][this.y].characters.push(this.id)
-                }
-            }
-            else {
-                this.startX = this.endX
-                this.startY = this.endY
-                this.endX = this.x
-                this.endY = this.y
-            }
-        }
+        this.occupies = []
+        this.reserves = []
         switch(type) {
             case 0:
                 //GAME VALUES
@@ -111,24 +69,6 @@ class character {
                     // y: Offset for the height of the image + position on y tyles + Jump curve - Movement in y axis - camera offset
                     drawImage(images[this.imageIndex[this.facing]], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
                     95+this.endY*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY+this.yOffset,0.35)
-                }
-                this.kill = function(type) {
-                    charIndexSet(this.id)
-                    if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5) {
-                        tilelist[this.startX][this.startY].characters = tilelist[this.startX][this.startX].characters.filter((id) => id != this.id)
-                    }
-                    else
-                    tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
-                    switch (type) {
-                        case 0:
-                            this.dying = 1
-                        break
-                        case 1:
-                            this.dying = 2
-                            this.draw = function() {}
-                        break
-                    }
-                    gameOver = true
                 }
                 
                 this.update = function() {
@@ -150,6 +90,22 @@ class character {
 
                 this.imageIndex = 4
                 this.draw = function() {
+                    drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
+                    25+this.endY*50+-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
+                    40,"black",0.5)
+
+                    tempX = 260+this.endX*120-camX-this.endY*40
+                    if (this.stepphase == 2) {
+                        tempY += 120*Math.sin(Math.PI/2)
+                    }
+                    else if (this.stepphase == 3) {
+                        tempY += 120*Math.sin(Math.PI/2)*(this.stepping/this.fallTime)
+                    }
+                    if (this.stepphase == 1) {
+                        
+                    }
+
+                    tempY = 70+this.endY*50-camY
                     switch (this.stepphase) {
                         case 3:
                             if (tilelist[this.x][this.y].type != 1) {drawRect(260+this.endX*120-camX-this.endY*40,25+this.endY*50-camY,65,40,"black",0.5)}
@@ -164,7 +120,7 @@ class character {
                         
                         case 1: 
                         if (tilelist[this.x][this.y].type != 1) {drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
-                        25+this.endY*50+-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
+                        25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
                         40,"black",0.5)}
                         drawImage(images[this.imageIndex], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
                         70+this.endY*50+(120*Math.sin((Math.PI/2)*(1-this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,4)
@@ -210,6 +166,86 @@ class character {
         characterList[characterIndex] = this
         charIndexIncrease()
         
+    }
+    step(direction) {
+        if (direction == undefined) {return}
+        if (this.type == 0) {this.facing = direction}
+        this.stepphase = 1
+        this.stepping = this.stepTime
+        characterRenderList[this.y] = characterRenderList[this.y].filter((id) => id != this.id)
+        switch(direction) {
+            case 0: this.endX += 1; break
+            case 1: this.endX -= 1; break
+            case 2: this.endY += 1; break
+            case 3: this.endY -= 1; break
+        }
+        characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
+        if (this.type > 0 && this.endX > -1 && this.endX < tilelist.length && this.endY > -1 && this.endY < 6) {
+            tilelist[this.endX][this.endY].occupied = 1
+        }
+    }
+    stepFinish() {
+        if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5 || tilelist[this.x][this.y].type == 1) {
+            this.kill(0)
+        }
+        if (this.startY < this.endY) {
+            characterRenderList[this.startY] = characterRenderList[this.startY].filter((id) => id != this.id)
+            characterRenderList[this.y].push(this.id)
+        }
+        this.startX = this.x
+        this.startY = this.y
+    }
+    halfStep() {
+        if (this.endX < 0 || this.endX > tilelist.length-1 || this.endY < 0 || this.endY > 5 || tilelist[this.endX][this.endY].occupied < 2) {
+            tilelist[this.x][this.y].occupied = 0
+            tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+            this.x = this.endX
+            this.y = this.endY
+            if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6) {
+                tilelist[this.x][this.y].occupied += 2
+                tilelist[this.x][this.y].characters.push(this.id)
+            }
+        }
+        else {
+            this.startX = this.endX
+            this.startY = this.endY
+            this.endX = this.x
+            this.endY = this.y
+        }
+    }
+    occupy(x,y) {
+        this.occupies.append([x,y])
+        occupyUpdate()
+    }
+    reserve(x,y) {
+        this.reserves.append([x,y])
+        occupyUpdate()
+    }
+    deOccupy(x,y) {
+        this.occupies.filter((value) => value != [x,y])
+        occupyUpdate()
+    }
+    deReserve(x,y) {
+        this.reserves.filter((value) => value != [x,y])
+        occupyUpdate()
+    }
+    kill(type) {
+        charIndexSet(this.id)
+        if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5) {
+            tilelist[this.startX][this.startY].characters = tilelist[this.startX][this.startX].characters.filter((id) => id != this.id)
+        }
+        else
+        tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+        switch (type) {
+            case 0:
+                this.dying = 1
+            break
+            case 1:
+                this.dying = 2
+                this.draw = function() {}
+            break
+        }
+        gameOver = true
     }
 }
 //  MATHS
