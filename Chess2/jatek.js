@@ -40,6 +40,8 @@ function charIndexSet(index) {
 }
 class character {
     constructor(type,x,y) {
+        this.yOffset = 0
+        this.xOffset = 0
         this.x = x
         this.y = y
         tilelist[this.x][this.y].occupied = 2
@@ -57,7 +59,6 @@ class character {
                 this.stepTime = 20
                 
                 this.facing = 3
-                this.yOffset = 0
                 this.imageIndex = [0,1,2,3]
                 this.draw = function() {
                     if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6 && tilelist[this.x][this.y].type != 1) {
@@ -90,11 +91,14 @@ class character {
 
                 this.imageIndex = 4
                 this.draw = function() {
-                    drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
-                    25+this.endY*50+-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
-                    40,"black",0.5)
+                    if (tilelist[this.x][this.y].type != 1) {
+                        drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
+                        25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
+                        40,"black",0.5)
+                    }
 
-                    tempX = 260+this.endX*120-camX-this.endY*40
+                    let tempX = 260+this.endX*120-camX-this.endY*40
+                    let tempY = 70+this.endY*50-camY
                     if (this.stepphase == 2) {
                         tempY += 120*Math.sin(Math.PI/2)
                     }
@@ -102,11 +106,13 @@ class character {
                         tempY += 120*Math.sin(Math.PI/2)*(this.stepping/this.fallTime)
                     }
                     if (this.stepphase == 1) {
-                        
+                        tempY += 120*Math.sin((Math.PI/2)*(1-this.stepping/this.stepTime))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)
+                        tempX -= ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)
                     }
+                    drawImage(images[this.imageIndex], tempX, tempY,4)
 
-                    tempY = 70+this.endY*50-camY
-                    switch (this.stepphase) {
+                    
+                    /*switch (this.stepphase) {
                         case 3:
                             if (tilelist[this.x][this.y].type != 1) {drawRect(260+this.endX*120-camX-this.endY*40,25+this.endY*50-camY,65,40,"black",0.5)}
                             drawImage(images[this.imageIndex], 260+this.endX*120-camX-this.endY*40,
@@ -131,7 +137,7 @@ class character {
                             drawImage(images[this.imageIndex], 260+this.endX*120-camX-this.endY*40,
                             70+this.endY*50-camY,4)
                         break
-                    }
+                    }*/
                     
                 }
                 this.stepping = 0
