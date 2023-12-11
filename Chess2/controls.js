@@ -31,7 +31,7 @@ function controlUp(press) {
     }
 }
 function controlPress(press) {
-    if (press == 4) {console.log(pathTo(0,0,1,0))}
+    if (press == 4) {}
 }
 function pressedTick() {
     /*if (controlPressed[0]) {camX += 8}
