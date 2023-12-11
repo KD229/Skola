@@ -69,19 +69,24 @@ class character {
             case 0:
                 //GAME VALUES
                 this.stepTime = 20
+                this.attackTime = 50
+                this.attacking = 0
                 
                 this.facing = 3
                 this.imageIndex = [0,1,2,3]
                 this.draw = function() {
                     if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6 && tilelist[this.x][this.y].type != 1) {
-                        drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
-                        25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
+                        drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-this.endY*40,
+                        25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime),65,
                         40,"black",0.5)
                     }
                     // x: Offset of lowest row + position on x tyles - Movement, both in x and y axis - camera offset - adjusting for board diagonalness
                     // y: Offset for the height of the image + position on y tyles + Jump curve - Movement in y axis - camera offset
-                    drawImage(images[this.imageIndex[this.facing]], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
-                    95+this.endY*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY+this.yOffset,0.35)
+                    /*if (this.attacking > 0) {
+                        drawRect(260+this.x*120+this.swordDir*100,)
+                    }*/
+                    drawImage(images[this.imageIndex[this.facing]], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-this.endY*40,
+                    95+this.endY*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)+this.yOffset,0.35)
                 }
                 
                 this.update = function() {
@@ -104,13 +109,13 @@ class character {
                 this.imageIndex = 4
                 this.draw = function() {
                     if (tilelist[this.x][this.y].type != 1) {
-                        drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-camX-this.endY*40,
-                        25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)-camY,65,
+                        drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-this.endY*40,
+                        25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime),65,
                         40,"black",0.5)
                     }
 
-                    let tempX = 260+this.endX*120-camX-this.endY*40
-                    let tempY = 70+this.endY*50-camY
+                    let tempX = 260+this.endX*120-this.endY*40
+                    let tempY = 70+this.endY*50
                     if (this.stepphase == 2) {
                         tempY += 120*Math.sin(Math.PI/2)
                     }
@@ -136,7 +141,6 @@ class character {
                     else if (this.stepphase == 2 && this.stepping == 0) {this.stepphase = 3; this.stepping = this.fallTime}
                     else if (this.stepphase == 3 && this.stepping == 0) {this.attack()}
                 }
-
                 this.attack = function() {
                     this.occupy(this.x,this.y)
                     this.stepphase = 0
@@ -185,12 +189,8 @@ class character {
         this.startY = this.y
     }
     halfStep() {
-        if (this.endX < 0 || this.endX > tilelist.length-1 || this.endY < 0 || this.endY > 5 || occupyList[this.endX][this.endY] < 2) {
+        if (this.endX < 0 || this.endX > tilelist.length-1 || this.endY < 0 || this.endY > 5 || this.type == 1 || occupyList[this.endX][this.endY] < 2) {
             this.deOccupy(this.x, this.y)
-            if (this.type == 0) {
-            console.log(this.x, this.y)
-            console.log(this.occupies)
-            }
             tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
             this.x = this.endX
             this.y = this.endY
@@ -261,12 +261,12 @@ let characterRenderList = Array(7).fill().map(() => Array())
 function drawGame() {
     //Called every game loop, responsible for drawing all graphics (No drawing should be outside of it!)
     drawRect(600,300,1200,600,"rgb(100, 130, 255)")
-    drawRect(600,0-camY,1200,550,"rgb(255, 0, 0)")
+    drawRect(600,0,1200,550,"rgb(255, 0, 0)")
     characterRenderList[6].forEach(element => {characterList[element].draw()})
     for (let ii = 5;ii > -1;ii--) {
         for (let i = 9;i > -1;i--) {
             switch(tilelist[i][ii].type) {
-                case 0: drawRect(260+i*120-camX-ii*40,25+ii*50-camY,120,50,i % 2 == ii % 2 ? "rgb(255,255,255)" : "rgb(50,50,50)"); break
+                case 0: drawRect(260+i*120-ii*40,25+ii*50,120,50,i % 2 == ii % 2 ? "rgb(255,255,255)" : "rgb(50,50,50)"); break
             }           
         }
         characterRenderList[ii].forEach(element => {characterList[element].draw()})
