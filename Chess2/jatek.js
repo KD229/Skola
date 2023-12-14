@@ -2,6 +2,8 @@ let context = document.getElementById("canvas").getContext("2d")
 let tilelist = Array(10).fill().map(() => Array(6).fill().map(() => ({type: 0,characters: [],danger: false}))) //tilelist[x][y]
 tilelist[4][2].type = 1
 tilelist[4][5].type = 1
+tilelist[5][5].type = 1
+tilelist[6][5].type = 1
 let camX = 0
 let camY = -50
 let images = null
@@ -191,11 +193,14 @@ class character {
     halfStep() {
         if (this.endX < 0 || this.endX > tilelist.length-1 || this.endY < 0 || this.endY > 5 || this.type == 1 || occupyList[this.endX][this.endY] < 2) {
             this.deOccupy(this.x, this.y)
+            this.deReserve(this.x, this.y)
             tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
             this.x = this.endX
             this.y = this.endY
             if (this.x > -1 && this.x < tilelist.length && this.y > -1 && this.y < 6) {
-                this.occupy(this.x,this.y)
+                if (this.type != 1) {
+                    this.occupy(this.x,this.y)
+                }
                 tilelist[this.x][this.y].characters.push(this.id)
             }
             occupyUpdate()
@@ -226,7 +231,7 @@ class character {
     kill(type) {
         charIndexSet(this.id)
         if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5) {
-            tilelist[this.startX][this.startY].characters = tilelist[this.startX][this.startX].characters.filter((id) => id != this.id)
+            tilelist[this.startX][this.startY].characters = tilelist[this.startX][this.startY].characters.filter((id) => id != this.id)
         }
         else
         tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
@@ -276,8 +281,8 @@ function drawGame() {
 //  GAME!!
 function start() {
     player = new character(0, 2, 3)
+    new character(1, 6, 4)
     new character(1, 6, 3)
-    new character(1, 6, 2)
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
         characterList.forEach(character => {
