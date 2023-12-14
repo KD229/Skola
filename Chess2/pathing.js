@@ -27,7 +27,7 @@ function pathTo(x,y,startX,startY) {
 function pathable(x,y,pathed) {
     if (x < 0 || x > pathed.length-1 || y < 0 || y > 5) {return false}
     if (tilelist[x][y].type == 1) {return false}
-    if (tilelist[x][y].occupied > 0) {return false}
+    if (occupyList[x][y] > 0) {return false}
     if (pathed[x][y]) {return false}
     return true
 }
