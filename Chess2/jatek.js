@@ -71,9 +71,8 @@ class character {
             case 0:
                 //GAME VALUES
                 this.stepTime = 20
-                this.attackTime = 50
-                this.attacking = 0
-                
+                this.attackTime = 80
+
                 this.facing = 3
                 this.imageIndex = [0,1,2,3]
                 this.draw = function() {
@@ -84,11 +83,17 @@ class character {
                     }
                     // x: Offset of lowest row + position on x tyles - Movement, both in x and y axis - camera offset - adjusting for board diagonalness
                     // y: Offset for the height of the image + position on y tyles + Jump curve - Movement in y axis - camera offset
-                    /*if (this.attacking > 0) {
-                        drawRect(260+this.x*120+this.swordDir*100,)
-                    }*/
+                    if (this.facing < 2) {
+                        drawRect(260+this.x*120-this.y*40+(this.facing*2-1),95+this.y*50) //ERRE A SORRA EMLÉKEZZ ÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁ
+                    }
+                    if (this.facing == 2) {
+                        drawRect(260+this.x*120-this.y*40,95+this.y*50)
+                    }
                     drawImage(images[this.imageIndex[this.facing]], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-this.endY*40,
                     95+this.endY*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)+this.yOffset,0.35)
+                    if (this.facing == 3) {
+                        drawRect(260+this.x*120-this.y*40,95+this.y*50)
+                    }
                 }
                 
                 this.update = function() {
@@ -98,9 +103,22 @@ class character {
                     else if (this.dying == 2) {}
                     else if (this.stepping == 0 && stepDir != null) {this.step(stepDir)}
                     else if (this.stepping == Math.round(this.stepTime / 2)) {this.halfStep()}
+
+                    if (this.attacking > 0) {
+                        this.attacking -= 1
+                        console.log(tilelist[this.x+[1,-1,0,0][this.facing]][this.y+[0,0,1,-1][this.facing]].characters)
+                        if (Math.round(this.attackTime/4) < this.attacking < Math.round(this.attackTime/4*3)) {tilelist[this.x+[1,-1,0,0][this.facing]][this.y+[0,0,1,-1][this.facing]].characters.forEach(id => {
+                            characterList[id].kill(0)
+                        })}
+                    }
+                }
+                this.attack = function() {
+                    if (this.attacking > 0) {return}
+                    this.attacking = this.attackTime
                 }
                 
                 this.stepping = 0
+                this.attacking = 0
                 break
             case 1:
                 this.stepTime = 25
@@ -110,6 +128,9 @@ class character {
 
                 this.imageIndex = 4
                 this.draw = function() {
+                    if (this.dying > 0) {
+                        return
+                    }
                     if (tilelist[this.x][this.y].type != 1) {
                         drawRect(260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-this.endY*40,
                         25+this.endY*50-((this.endY-this.startY)*50)*(this.stepping/this.stepTime),65,
@@ -134,6 +155,9 @@ class character {
                 this.stepphase = 0
                 //STEP PHASES:  0: Standing Still   1: Jumping  2: Standing still in air    3: Smashing down    4: Cooling down
                 this.update = function() {
+                    if (this.dying > 0) {
+                        return
+                    }
                     if (this.stepphase == 1 && this.stepping == Math.round(this.stepTime / 2)) {this.halfStep()}
                     if (this.stepping != 0) {this.stepping -= 1}
                     else if (this.stepphase == 0 && this.stepping == 0) {
@@ -164,6 +188,7 @@ class character {
     }
     step(direction) {
         if (direction == undefined) {return}
+        if (this.attacking != undefined && this.attacking > 0) {return}
         if (this.type == 0) {this.facing = direction}
         this.stepphase = 1
         this.stepping = this.stepTime
@@ -286,6 +311,7 @@ function start() {
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
         characterList.forEach(character => {
+            console.log(player.facing)
             if (character == null) {return}
             character.update()
         })
