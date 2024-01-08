@@ -83,11 +83,15 @@ class character {
                     }
                     // x: Offset of lowest row + position on x tyles - Movement, both in x and y axis - camera offset - adjusting for board diagonalness
                     // y: Offset for the height of the image + position on y tyles + Jump curve - Movement in y axis - camera offset
-                    if (this.facing < 2) {
-                        drawRect(260+this.x*120-this.y*40+(this.facing*2-1),95+this.y*50) //ERRE A SORRA EMLÉKEZZ ÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁ
-                    }
-                    if (this.facing == 2) {
-                        drawRect(260+this.x*120-this.y*40,95+this.y*50)
+                    if (this.attacking > 0) {
+                        
+                        if (this.facing < 2) {
+                            
+                            if (this.attacking/this.attackTime > 0.75) {console.log((this.attacking-this.attackTime*0.75)/(this.attackTime*0.25));drawRect(260-(this.facing*2-1)*(Math.sin(Math.PI/2+Math.PI/2*((this.attacking-this.attackTime*0.75)/(this.attackTime*0.25))))*200+this.x*120-this.y*40,75+this.y*50,(Math.sin(Math.PI/2*(this.attacking-this.attackTime*0.75)/(this.attackTime*0.25)))*200,40,"grey")} //EHHEZ NEM IS KELL KOMMENT OLYAN ROHADT HOSSZU HOGY ÉSZERVESZEM
+                        }
+                        if (this.facing == 2) {
+                            drawRect(260+this.x*120-this.y*40,95+this.y*50)
+                        }
                     }
                     drawImage(images[this.imageIndex[this.facing]], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-this.endY*40,
                     95+this.endY*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)+this.yOffset,0.35)
@@ -106,7 +110,6 @@ class character {
 
                     if (this.attacking > 0) {
                         this.attacking -= 1
-                        console.log(tilelist[this.x+[1,-1,0,0][this.facing]][this.y+[0,0,1,-1][this.facing]].characters)
                         if (Math.round(this.attackTime/4) < this.attacking < Math.round(this.attackTime/4*3)) {tilelist[this.x+[1,-1,0,0][this.facing]][this.y+[0,0,1,-1][this.facing]].characters.forEach(id => {
                             characterList[id].kill(0)
                         })}
@@ -311,7 +314,6 @@ function start() {
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
         characterList.forEach(character => {
-            console.log(player.facing)
             if (character == null) {return}
             character.update()
         })
