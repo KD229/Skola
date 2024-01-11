@@ -87,7 +87,9 @@ class character {
                         
                         if (this.facing < 2) {
                             
-                            if (this.attacking/this.attackTime > 0.75) {console.log((this.attacking-this.attackTime*0.75)/(this.attackTime*0.25));drawRect(260-(this.facing*2-1)*(Math.sin(Math.PI/2+Math.PI/2*((this.attacking-this.attackTime*0.75)/(this.attackTime*0.25))))*200+this.x*120-this.y*40,75+this.y*50,(Math.sin(Math.PI/2*(this.attacking-this.attackTime*0.75)/(this.attackTime*0.25)))*200,40,"grey")} //EHHEZ NEM IS KELL KOMMENT OLYAN ROHADT HOSSZU HOGY ÉSZERVESZEM
+                            console.log(((this.attacking-this.attackTime*0.75)/(this.attackTime*0.25)))
+                            if (this.attacking/this.attackTime > 0.75) //{drawRect(260+(this.facing*2-1)*(-Math.sin(Math.PI/2*((this.attacking-this.attackTime*0.75)/(this.attackTime*0.25)))*75)+this.x*120-this.y*40,75+this.y*50,(1-Math.sin(Math.PI/2*(this.attacking-this.attackTime*0.75)/(this.attackTime*0.25)))*150,40,"grey")} //EHHEZ NEM IS KELL KOMMENT OLYAN ROHADT HOSSZU HOGY ÉSZERVESZEM
+                            {drawRect(260+(this.facing*2-1)*(-100+(((this.attacking-this.attackTime*0.75)/(this.attackTime*0.25)/2)**2)*800)+this.x*120-this.y*40,75+this.y*50,(1-Math.sin(Math.PI/2*(this.attacking-this.attackTime*0.75)/(this.attackTime*0.25)))*150,40,"grey")} //EHHEZ NEM IS KELL KOMMENT OLYAN ROHADT HOSSZU HOGY ÉSZERVESZEM
                         }
                         if (this.facing == 2) {
                             drawRect(260+this.x*120-this.y*40,95+this.y*50)
