@@ -31,7 +31,7 @@ function controlUp(press) {
     }
 }
 function controlPress(press) {
-    if (press == 4) {}
+    if (press == 4) {player.attack()}
 }
 function pressedTick() {
     /*if (controlPressed[0]) {camX += 8}
