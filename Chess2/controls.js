@@ -1,9 +1,10 @@
-controlList = ["ArrowRight","ArrowLeft","ArrowUp","ArrowDown"," "]
-controlPressed = [false,false,false,false,false]
+controlList = ["ArrowRight","ArrowLeft","ArrowUp","ArrowDown"," ","k"]
+controlPressed = Array(controlList.length).fill(false)
+iterateStop = controlList.length
 let stepDir = null
 
 function controlDown(press) {
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < iterateStop; i++) {
         if (press == controlList[i]) {
             if (controlPressed[i]) {
                 return
@@ -18,7 +19,7 @@ function controlDown(press) {
     }
 }
 function controlUp(press) {
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < iterateStop; i++) {
         if (press == controlList[i]) {
             if (controlPressed[i]) {
                 controlPressed[i] = false
@@ -32,6 +33,7 @@ function controlUp(press) {
 }
 function controlPress(press) {
     if (press == 4) {player.attack()}
+    if (press == 5) {characterList.forEach(character => {character.shift(0,-1)})}
 }
 function pressedTick() {
     /*if (controlPressed[0]) {camX += 8}
