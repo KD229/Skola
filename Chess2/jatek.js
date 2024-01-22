@@ -275,6 +275,25 @@ class character {
         }
         gameOver = true
     }
+    shift(x,y) {
+        //shifts character by coordinates, teleporting it. should handle like everything.
+        characterRenderList[Math.max(Math.min(this.endY,this.startY),0)] = characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].filter((id) => id != this.id)
+        tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+        this.x += x
+        this.y += y
+        this.startX += x
+        this.startY += y
+        this.endX += x
+        this.endY += y
+        for (i = 0; i < this.occupies.length; i++) {
+            this.occupies[i] = [this.occupies[i][0] + x, this.occupies[i][1] + y]
+        }
+        for (i = 0; i < this.reserves.length; i++) {
+            this.reserves[i] = [this.reserves[i][0] + x, this.reserves[i][1] + y]
+        }
+        tilelist[this.x][this.y].characters.push(this.id)
+        characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
+    }
 }
 //  MATHS
 
@@ -306,7 +325,15 @@ function drawGame() {
         characterRenderList[ii].forEach(element => {characterList[element].draw()})
     }
 }
+//  Game stuff
 
+function removeColumn() {
+    tilelist[0].forEach(tile => {
+        tile.characters.forEach(id => {
+            console.log(id)//BLELELELELELELELELELELLELELELELELEELELELLELELEELELLELELLELLELELELLELELELELELE
+        })
+    })
+}
 //  GAME!!
 function start() {
     player = new character(0, 2, 3)
