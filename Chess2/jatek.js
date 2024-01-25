@@ -9,6 +9,7 @@ let camY = -50
 let images = null
 let xgoal = 0
 let ygoal = 0
+let tileAlt = 0
 /* TILE TYPES
     0 - Tile
     1 - Pit
@@ -275,10 +276,12 @@ class character {
         }
         gameOver = true
     }
-    shift(x,y) {
+    shift(x,y,noTile = false) {
         //shifts character by coordinates, teleporting it. should handle like everything.
-        characterRenderList[Math.max(Math.min(this.endY,this.startY),0)] = characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].filter((id) => id != this.id)
-        tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+        if (noTile == false) {
+            characterRenderList[Math.max(Math.min(this.endY,this.startY),0)] = characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].filter((id) => id != this.id)
+            tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+        }
         this.x += x
         this.y += y
         this.startX += x
@@ -291,8 +294,10 @@ class character {
         for (i = 0; i < this.reserves.length; i++) {
             this.reserves[i] = [this.reserves[i][0] + x, this.reserves[i][1] + y]
         }
-        tilelist[this.x][this.y].characters.push(this.id)
-        characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
+        if (noTile == false) {
+            tilelist[this.x][this.y].characters.push(this.id)
+            characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
+        }
     }
 }
 //  MATHS
@@ -313,34 +318,37 @@ function FYS(array) {
 let characterRenderList = Array(7).fill().map(() => Array())
 function drawGame() {
     //Called every game loop, responsible for drawing all graphics (No drawing should be outside of it!)
-    drawRect(600,300,1200,600,"rgb(100, 130, 255)")
-    drawRect(600,0,1200,550,"rgb(255, 0, 0)")
+    drawRect(600+camX,300+camY,1200,600,"rgb(100, 130, 255)")
+    drawRect(600+camX,0+camY,1200,550,"rgb(255, 0, 0)")
     characterRenderList[6].forEach(element => {characterList[element].draw()})
     for (let ii = 5;ii > -1;ii--) {
-        for (let i = 9;i > -1;i--) {
+        for (let i = tilelist.length-1;i > -1;i--) {
             switch(tilelist[i][ii].type) {
-                case 0: drawRect(260+i*120-ii*40,25+ii*50,120,50,i % 2 == ii % 2 ? "rgb(255,255,255)" : "rgb(50,50,50)"); break
+                case 0: drawRect(260+i*120-ii*40,25+ii*50,120,50,(i+tileAlt) % 2 == ii % 2 ? "rgb(255,255,255)" : "rgb(50,50,50)"); break
             }           
         }
         characterRenderList[ii].forEach(element => {characterList[element].draw()})
     }
 }
 //  Game stuff
-
 function removeColumn() {
-    tilelist[0].forEach(tile => {
-        tile.characters.forEach(id => {
-            console.log(id)//BLELELELELELELELELELELLELELELELELEELELELLELELEELELLELELLELLELELELLELELELELELE
-        })
-    })
+    camX += -120
+    console.log("Alright, things should be happenin")
+    characterList.forEach(character => {if (character != null) {character.shift(-1,0,true)}})
+    tilelist.shift()
+    if (tileAlt == 0) {tileAlt = 1}
+    else {tileAlt = 0}
+    timers.push([240,removeColumn])
 }
 //  GAME!!
 function start() {
+    timers.push([240,removeColumn])
     player = new character(0, 2, 3)
     new character(1, 6, 4)
     new character(1, 6, 3)
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
+        console.log(tileAlt)
         characterList.forEach(character => {
             if (character == null) {return}
             character.update()
@@ -350,8 +358,8 @@ function start() {
         timers.forEach(timer => {
             if (timer[0] == 0) {
                 if (timer[2] != undefined) {timer[1](timer[2])}
-                else timer[1]()
-                timers = timers.filter((id) => id != this.id)
+                else {timer[1]()}
+                timers = timers.filter((timer2) => timer2 != timer)
             }
             else timer[0]--
             
