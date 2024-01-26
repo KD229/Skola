@@ -129,7 +129,7 @@ class character {
                 this.stepTime = 25
                 this.airTime = 10
                 this.fallTime = 6
-                this.cooldown = 80
+                this.cooldown = 30
 
                 this.imageIndex = 4
                 this.draw = function() {
@@ -259,12 +259,13 @@ class character {
         occupyUpdate()
     }
     kill(type) {
+        characterList[this.id] = null
         charIndexSet(this.id)
         if (this.x < 0 || this.x > tilelist.length-1 || this.y < 0 || this.y > 5) {
             tilelist[this.startX][this.startY].characters = tilelist[this.startX][this.startY].characters.filter((id) => id != this.id)
         }
-        else
-        tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)
+        else {tilelist[this.x][this.y].characters = tilelist[this.x][this.y].characters.filter((id) => id != this.id)}
+        characterRenderList[Math.max(Math.min(this.endY,this.startY),0)] = characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].filter((id) => id != this.id)
         switch (type) {
             case 0:
                 this.dying = 1
@@ -294,6 +295,7 @@ class character {
         for (i = 0; i < this.reserves.length; i++) {
             this.reserves[i] = [this.reserves[i][0] + x, this.reserves[i][1] + y]
         }
+        occupyUpdate()
         if (noTile == false) {
             tilelist[this.x][this.y].characters.push(this.id)
             characterRenderList[Math.max(Math.min(this.endY,this.startY),0)].push(this.id)
@@ -348,7 +350,6 @@ function start() {
     new character(1, 6, 3)
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
-        console.log(tileAlt)
         characterList.forEach(character => {
             if (character == null) {return}
             character.update()
