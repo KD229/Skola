@@ -21,3 +21,6 @@ function drawText(x,y,text,font,fontSize,centered,color,alpha = 1) {
     context.fillText(text,0,0)
     context.resetTransform()
 }
+function cameraUpdate() {
+    camX = (player.endX*120-((player.endX-player.startX)*120-(player.endY-player.startY)*40)*(player.stepping/player.stepTime)-player.endY*40-140 + 10*camX)/11
+}

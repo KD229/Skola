@@ -1,5 +1,5 @@
 let context = document.getElementById("canvas").getContext("2d")
-let tilelist = Array(10).fill().map(() => Array(6).fill().map(() => ({type: 0,characters: [],danger: false}))) //tilelist[x][y]
+let tilelist = Array(20).fill().map(() => Array(6).fill().map(() => ({type: 0,characters: [],danger: false}))) //tilelist[x][y]
 tilelist[4][2].type = 1
 tilelist[4][5].type = 1
 tilelist[5][5].type = 1
@@ -350,6 +350,7 @@ function start() {
     new character(1, 6, 3)
     context.imageSmoothingEnabled = false
     gameLoop = setInterval( function() {
+        cameraUpdate()
         characterList.forEach(character => {
             if (character == null) {return}
             character.update()
