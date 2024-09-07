@@ -10,6 +10,8 @@ let images = null
 let xgoal = 0
 let ygoal = 0
 let tileAlt = 0
+let startT = 0
+const frameTime = 10
 /* TILE TYPES
     0 - Tile
     1 - Pit
@@ -95,8 +97,8 @@ class character {
                             drawRect(260+this.x*120-this.y*40,95+this.y*50)
                         }
                     }
-                    drawImage(images[this.imageIndex[this.facing]], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*(this.stepping/this.stepTime)-this.endY*40,
-                    95+this.endY*50+(30*Math.sin(Math.PI*(this.stepping/this.stepTime)))-((this.endY-this.startY)*50)*(this.stepping/this.stepTime)+this.yOffset,0.35)
+                    drawImage(images[this.imageIndex[this.facing]], 260+this.endX*120 - ((this.endX-this.startX)*120-(this.endY-this.startY)*40)*((this.stepping-(Date.now()-startT)/frameTime)/this.stepTime)-this.endY*40,
+                    95+this.endY*50+(30*Math.sin(Math.PI*((this.stepping-(Date.now()-startT)/frameTime)/this.stepTime)))-((this.endY-this.startY)*50)*((this.stepping-(Date.now()-startT)/frameTime)/this.stepTime)+this.yOffset,0.35)
                     if (this.facing == 3) {
                         drawRect(260+this.x*120-this.y*40,95+this.y*50)
                     }
@@ -335,7 +337,6 @@ function drawGame() {
 //  Game stuff
 function removeColumn() {
     camX += -120
-    console.log("Alright, things should be happenin")
     characterList.forEach(character => {if (character != null) {character.shift(-1,0,true)}})
     tilelist.shift()
     if (tileAlt == 0) {tileAlt = 1}
@@ -356,7 +357,6 @@ function start() {
             character.update()
         })
         pressedTick()
-        drawGame()
         timers.forEach(timer => {
             if (timer[0] == 0) {
                 if (timer[2] != undefined) {timer[1](timer[2])}
@@ -366,7 +366,11 @@ function start() {
             else timer[0]--
             
         })
-    },10)
+        startT = Date.now()
+    },frameTime)
+    renderLoop = setInterval( function() {
+        drawGame()
+    }, 0);
 }
 function doit() {
     xgoal = Number(document.getElementById('x').value)
