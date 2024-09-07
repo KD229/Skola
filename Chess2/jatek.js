@@ -345,6 +345,7 @@ function removeColumn() {
 }
 //  GAME!!
 function start() {
+    // TODO
     timers.push([240,removeColumn])
     player = new character(0, 2, 3)
     new character(1, 6, 4)
