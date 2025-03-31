@@ -42,11 +42,11 @@ onClick = (target, esemeny) => {
         alert("Ne csalj")
         return
     }
-    if (esemeny != undefined && esemeny.button == 2 && (target.innerHTML.trim() == "" || target.innerHTML == '🚩')) {
+    if (esemeny != undefined && esemeny.button == 2 && (target.innerHTML == "" || target.innerHTML == '🚩')) {
         if (target.innerHTML == '🚩') {target.innerHTML = ""}
         else {target.innerHTML = '🚩'}
     }
-    if ((esemeny == undefined || esemeny.button == 0) && target.innerHTML.trim() === "") {
+    if ((esemeny == undefined || esemeny.button == 0) && target.innerHTML === "") {
         let x = target.cellIndex
         let y = target.parentElement.rowIndex
 
@@ -67,7 +67,7 @@ onClick = (target, esemeny) => {
                                 + bennevan([x + 1, y + 0])
                                 + bennevan([x + 1, y + 1]);
         if (neighboursWithMines == 0) {
-            target.innerHTML = "0"
+            target.innerHTML = " "
         }
         else {
             target.innerHTML = neighboursWithMines
