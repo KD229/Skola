@@ -1,5 +1,5 @@
-let n = 64
-let aknaszam = 640
+let n = 32
+let aknaszam = 160
 let maradhely = n * n - aknaszam
 let aknak = []
 let halott = false;
