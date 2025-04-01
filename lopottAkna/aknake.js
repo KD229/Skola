@@ -1,6 +1,6 @@
-let n = 32
-let aknaszam = 160
-let maradhely = n * n - aknaszam
+let n = 0
+let aknaszam = 0
+let maradhely = 0
 let aknak = []
 let halott = false;
 
@@ -93,15 +93,22 @@ onClick = (target, esemeny) => {
     }
 }
 killTheContextMenu = (esemeny) => {esemeny.preventDefault()}
-    
-(init = () => {
+
+window.onload = function() {
+    document.getElementById("aknak").value = 0.15
+}
+
+function begin() {
+    n = Number(document.getElementById("n").value)
+    aknaszam = Math.floor((n*n)*document.getElementById("aknak").value)
+    maradhely = n * n - aknaszam
     aknagen(aknaszam)
     document.getElementById('remaining').innerHTML = maradhely
     document.getElementById('tabla').innerHTML = `
     <table>
         ${Array(n).fill(`
         <tr>
-        ${Array(n).fill(`<td onmouseup="onClick(this, event)" oncontextmenu="killTheContextMenu(event)" />`).join('')}
+        ${Array(n).fill(`<td onmouseup="onClick(this, event)" oncontextmenu="killTheContextMenu(event)"></td>`).join('')}
         </tr>
         `).join('')}
     </table>`
@@ -131,4 +138,4 @@ killTheContextMenu = (esemeny) => {esemeny.preventDefault()}
 
     }
     onClick(document.getElementById('tabla').getElementsByTagName('tr')[veletlenszeruy].getElementsByTagName('td')[veletlenszerux])
-})()
+}
