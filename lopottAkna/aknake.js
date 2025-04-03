@@ -123,7 +123,9 @@ function begin() {
                             + bennevan([veletlenszerux + 1, veletlenszeruy + 0])
                             + bennevan([veletlenszerux + 1, veletlenszeruy + 1])
                             + bennevan([veletlenszerux + 0, veletlenszeruy + 0]);
-    while (mines != 0) {
+    let tries = 0
+    while (mines != 0 && tries < n*n*n) {
+        tries++
         veletlenszerux = Math.floor(Math.random() * n)
         veletlenszeruy = Math.floor(Math.random() * n)
         mines = bennevan([veletlenszerux - 1, veletlenszeruy - 1])
@@ -137,5 +139,12 @@ function begin() {
                             + bennevan([veletlenszerux + 0, veletlenszeruy + 0]);
 
     }
-    onClick(document.getElementById('tabla').getElementsByTagName('tr')[veletlenszeruy].getElementsByTagName('td')[veletlenszerux])
+    if (tries == n*n*n) {
+        while (bennevan([veletlenszerux, veletlenszeruy])) {
+            veletlenszerux = Math.floor(Math.random() * n)
+            veletlenszeruy = Math.floor(Math.random() * n)
+        }
+        onClick(document.getElementById('tabla').getElementsByTagName('tr')[veletlenszeruy].getElementsByTagName('td')[veletlenszerux])
+    }
+    else {onClick(document.getElementById('tabla').getElementsByTagName('tr')[veletlenszeruy].getElementsByTagName('td')[veletlenszerux])}
 }
